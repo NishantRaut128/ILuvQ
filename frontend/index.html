@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ILuvQ — Turn any PDF into a smart test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --purple-mid: #c4b5fd;
+      --purple-dark: #5b21b6;
+      --bg: #f8f7ff;
+      --white: #ffffff;
+      --text: #1a1a2e;
+      --muted: #666680;
+      --border: #e8e4f8;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 60px;
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      letter-spacing: -0.5px;
+    }
+    .logo .heart { color: var(--purple); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--purple); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; border-radius: 9px; padding: 8px 20px; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { border-color: var(--purple); color: var(--purple); }
+    .btn-primary { background: var(--purple); color: #fff; }
+    .btn-primary:hover { background: var(--purple-dark); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 72px 24px 48px;
+      max-width: 680px;
+      margin: 0 auto;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--purple-light);
+      color: var(--purple);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+    .hero h1 span { color: var(--purple); }
+
+    .hero-caption {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    .hero-caption em {
+      font-style: normal;
+      color: var(--purple);
+      font-weight: 500;
+    }
+
+    /* UPLOAD BOX */
+    .upload-wrap {
+      max-width: 540px;
+      margin: 0 auto 16px;
+      animation: fadeUp 0.6s 0.15s ease both;
+    }
+
+    .upload-box {
+      background: var(--white);
+      border: 2px dashed var(--purple-mid);
+      border-radius: 18px;
+      padding: 44px 32px 36px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+    }
+    .upload-box:hover {
+      border-color: var(--purple);
+      background: #faf8ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124,58,237,0.08);
+    }
+    .upload-box.dragover {
+      border-color: var(--purple);
+      background: var(--purple-light);
+    }
+
+    .upload-icon-wrap {
+      width: 56px;
+      height: 56px;
+      background: var(--purple-light);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .upload-icon-wrap i { font-size: 26px; color: var(--purple); }
+
+    .upload-box h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .upload-box p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .upload-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-upload {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s;
+    }
+    .btn-upload:hover { background: var(--purple-dark); }
+
+    .btn-drive {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--white);
+      color: #444;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.2s;
+    }
+    .btn-drive:hover { border-color: #aaa; }
+
+    .drop-hint {
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* MODE CARDS */
+    .mode-section {
+      max-width: 540px;
+      margin: 28px auto 64px;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .mode-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .mode-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .mode-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .mode-card:hover {
+      border-color: var(--purple);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(124,58,237,0.1);
+    }
+
+    .mc-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .mc-icon i { font-size: 22px; }
+
+    .mode-card h4 {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text);
+    }
+    .mode-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* FEATURES */
+    .features {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 24px;
+    }
+
+    .features-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .features h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .features-sub {
+      text-align: center;
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .feat-item {
+      padding: 20px 16px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+    .feat-item:hover { transform: translateY(-2px); }
+
+    .feat-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--purple-light);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .feat-icon i { font-size: 18px; color: var(--purple); }
+
+    .feat-item h5 {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text);
+    }
+    .feat-item p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* HOW IT WORKS */
+    .how {
+      padding: 56px 24px;
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .how h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .how-sub { font-size: 15px; color: var(--muted); margin-bottom: 40px; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      text-align: left;
+    }
+
+    .step {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 16px;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: var(--purple);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .step h5 {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text);
+    }
+    .step p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* FOOTER */
+    footer {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .footer-logo span { color: var(--purple); }
+
+    .footer-note { font-size: 12px; color: #bbb; }
+
+    /* HIDDEN FILE INPUT */
+    #fileInput { display: none; }
+
+    /* SIGNUP MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 40px 36px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      animation: popIn 0.25s ease both;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--purple-light);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .modal-icon i { font-size: 26px; color: var(--purple); }
+
+    .modal h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .modal p { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+    .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-modal-primary {
+      padding: 13px;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s;
+    }
+    .btn-modal-primary:hover { background: var(--purple-dark); }
+
+    .btn-modal-ghost {
+      padding: 13px;
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      nav { padding: 0 16px; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 30px; }
+      .mode-cards { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="index.html">I<span class="heart">❤</span>Q</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Upload</a></li>
+      <li><a href="practice.html">Practice</a></li>
+      <li><a href="test.html">Test</a></li>
+      <li><a href="#">Help</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="btn btn-ghost">Login</button>
+      <button class="btn btn-primary">Sign up</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <i class="ti ti-sparkles"></i>
+      AI-powered question extractor
+    </div>
+    <h1>Turn any PDF into a<br /><span>smart test or practice</span></h1>
+    <p class="hero-caption">
+      Upload any question paper. Practice or test yourself instantly.<br />
+      <em>Q — Questions, your way.</em>
+    </p>
+  </section>
+
+  <!-- UPLOAD BOX -->
+  <div class="upload-wrap">
+    <div class="upload-box" id="uploadBox">
+      <div class="upload-icon-wrap">
+        <i class="ti ti-file-upload"></i>
+      </div>
+      <h3>Upload your question paper</h3>
+      <p>Supports PYQs, question banks, textbook exercises — any PDF</p>
+      <div class="upload-btns">
+        <button class="btn-upload" onclick="document.getElementById('fileInput').click()">
+          <i class="ti ti-upload" style="font-size:16px"></i>
+          Select PDF file
+        </button>
+        <button class="btn-drive">
+          <svg width="18" height="18" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+            <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+            <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+            <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+            <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+            <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+            <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+          </svg>
+          Google Drive
+        </button>
+      </div>
+    </div>
+    <p class="drop-hint">or drop your PDF anywhere on this page</p>
+  </div>
+
+  <input type="file" id="fileInput" accept=".pdf" />
+
+  <!-- MODE CARDS -->
+  <div class="mode-section">
+    <p class="mode-label">Choose your mode</p>
+    <div class="mode-cards">
+      <a class="mode-card" href="practice.html">
+        <div class="mc-icon" style="background:#ede9fe">
+          <i class="ti ti-book-2" style="color:#7c3aed"></i>
+        </div>
+        <h4>Practice</h4>
+        <p>No timer, no pressure. AI help anytime.</p>
+      </a>
+      <a class="mode-card" href="test.html">
+        <div class="mc-icon" style="background:#fce7f3">
+          <i class="ti ti-clock" style="color:#be185d"></i>
+        </div>
+        <h4>Test</h4>
+        <p>Set a timer, get scored at the end.</p>
+      </a>
+      <a class="mode-card" href="#">
+        <div class="mc-icon" style="background:#ecfdf5">
+          <i class="ti ti-robot" style="color:#059669"></i>
+        </div>
+        <h4>AI Help</h4>
+        <p>Ask anything about your questions.</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="features-inner">
+      <h2>Everything you need to ace your exams</h2>
+      <p class="features-sub">Built for students who want to attempt more and read less.</p>
+      <div class="feat-grid">
+        <div class="feat-item">
+          <div class="feat-icon"><i class="ti ti-file-text"></i></div>
+          <h5>Smart extraction</h5>
+          <p>AI reads MCQs, paragraphs and theory questions from any PDF format</p>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon"><i class="ti ti-progress"></i></div>
+          <h5>Live progress</h5>
+          <p>Chunk by chunk processing — watch questions appear as they extract</p>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon"><i class="ti ti-trophy"></i></div>
+          <h5>Instant scoring</h5>
+          <p>Submit your test and get your score with answers revealed instantly</p>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon"><i class="ti ti-brand-google-drive"></i></div>
+          <h5>Google Drive</h5>
+          <p>Pick PDFs straight from your Drive without downloading first</p>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon"><i class="ti ti-device-mobile"></i></div>
+          <h5>Works anywhere</h5>
+          <p>Fully responsive — attempt tests on phone, tablet or desktop</p>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon"><i class="ti ti-robot"></i></div>
+          <h5>AI tutor</h5>
+          <p>Stuck on a question? Ask the AI assistant for hints and explanations</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <h2>How it works</h2>
+    <p class="how-sub">From PDF to test in under a minute.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h5>Upload PDF</h5>
+        <p>Upload your PYQ or question bank from device or Google Drive</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h5>AI extracts</h5>
+        <p>Questions, options and answers extracted chunk by chunk</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h5>Review</h5>
+        <p>Quickly confirm AI suggested answers before starting</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h5>Attempt</h5>
+        <p>Practice freely or take a timed test — your choice</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">I<span>❤</span>Q</div>
+    <div class="footer-note">© ILuvQ 2026 · Your exam companion · Q — Questions</div>
+  </footer>
+
+  <!-- SIGNUP MODAL (30+ pages) -->
+  <div class="modal-overlay" id="signupModal">
+    <div class="modal">
+      <div class="modal-icon">
+        <i class="ti ti-lock"></i>
+      </div>
+      <h3>One quick step</h3>
+      <p>This PDF has <strong id="pageCount">35</strong> pages. Create a free account to continue — it takes 10 seconds.</p>
+      <div class="modal-btns">
+        <button class="btn-modal-primary">Create free account</button>
+        <button class="btn-modal-ghost" onclick="document.getElementById('signupModal').classList.remove('active')">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadBox = document.getElementById('uploadBox');
+    const modal = document.getElementById('signupModal');
+
+    fileInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      handleFile(file);
+    });
+
+    uploadBox.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadBox.classList.add('dragover');
+    });
+
+    uploadBox.addEventListener('dragleave', () => {
+      uploadBox.classList.remove('dragover');
+    });
+
+    uploadBox.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadBox.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') handleFile(file);
+    });
+
+    async function handleFile(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const text = new TextDecoder('latin1').decode(uint8Array);
+      const pageMatches = text.match(/\/Type\s*\/Page[^s]/g);
+      const pageCount = pageMatches ? pageMatches.length : 1;
+
+      if (pageCount >= 30) {
+        document.getElementById('pageCount').textContent = pageCount;
+        modal.classList.add('active');
+        return;
+      }
+
+      sessionStorage.setItem('uploadedFileName', file.name);
+      window.location.href = 'extraction.html';
+    }
+  </script>
+
+</body>
+</html>

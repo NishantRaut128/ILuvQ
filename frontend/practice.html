@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ILuvQ — Practice Mode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0e17;
+      --surface: #1a1826;
+      --surface2: #221f30;
+      --border: #2a2840;
+      --purple: #7c3aed;
+      --purple-light: #2d1f52;
+      --purple-mid: #a78bfa;
+      --purple-glow: rgba(124,58,237,0.15);
+      --text: #fffffe;
+      --muted: #8b8aab;
+      --green: #10b981;
+      --green-light: #0d2b22;
+      --green-border: #065f46;
+      --pink: #be185d;
+      --pink-light: #2d0a1f;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 12px; }
+
+    .back-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .back-btn:hover { color: var(--text); border-color: var(--purple); }
+
+    .nav-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .nav-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .mode-pill {
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 500;
+      background: #1a2e1a;
+      color: #6ee7b7;
+      border: 1px solid #065f46;
+    }
+
+    .logo-small {
+      font-family: 'Sora', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo-small span { color: var(--purple-mid); }
+
+    /* LAYOUT */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      height: calc(100vh - 56px);
+    }
+
+    /* QUESTION FEED */
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .feed-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* QUESTION CARD */
+    .q-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .q-card:hover { border-color: #3d3a5c; }
+    .q-card.attempted { border-color: var(--purple); }
+
+    .q-card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .q-num {
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--surface2);
+      padding: 3px 9px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .q-type {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+    .q-type.mcq { background: var(--purple-light); color: var(--purple-mid); }
+    .q-type.para { background: var(--pink-light); color: #f9a8d4; }
+
+    .q-attempted-badge {
+      margin-left: auto;
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--purple-mid);
+    }
+    .q-card.attempted .q-attempted-badge { display: flex; }
+
+    .q-text {
+      font-family: 'Sora', sans-serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    /* MCQ OPTIONS */
+    .mcq-opts {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 4px;
+    }
+
+    .mcq-opt {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 14px;
+      color: #ccc;
+    }
+    .mcq-opt:hover { border-color: var(--purple); background: var(--purple-light); color: var(--text); }
+    .mcq-opt.selected { border-color: var(--purple); background: var(--purple-light); color: var(--text); }
+
+    .opt-badge {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: all 0.15s;
+      font-family: 'Sora', sans-serif;
+    }
+    .mcq-opt.selected .opt-badge { background: var(--purple); color: #fff; }
+
+    /* PARA QUESTION */
+    .para-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-style: italic;
+    }
+
+    /* AI SIDEBAR */
+    .ai-sidebar {
+      width: 320px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+    }
+    .ai-sidebar.collapsed { width: 0; overflow: hidden; }
+
+    .ai-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .ai-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-icon-wrap {
+      width: 30px; height: 30px;
+      background: var(--purple-light);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ai-icon-wrap i { font-size: 15px; color: var(--purple-mid); }
+
+    .ai-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .ai-sub { font-size: 11px; color: var(--muted); }
+
+    .ai-close {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .ai-close:hover { color: var(--text); }
+
+    .ai-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .ai-msg {
+      padding: 10px 13px;
+      border-radius: 11px;
+      font-size: 13px;
+      line-height: 1.55;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .ai-msg.bot {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .ai-msg.user {
+      background: var(--purple-light);
+      border: 1px solid var(--purple);
+      color: var(--purple-mid);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .ai-msg-time {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .ai-typing {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 6px; height: 6px;
+      background: var(--muted);
+      border-radius: 50%;
+      animation: typingBounce 1.2s ease infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    .ai-quick-chips {
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .chip {
+      padding: 5px 11px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--purple); color: var(--purple-mid); background: var(--purple-light); }
+
+    .ai-input-wrap {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .ai-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: none;
+    }
+    .ai-input:focus { border-color: var(--purple); }
+    .ai-input::placeholder { color: var(--muted); }
+
+    .ai-send {
+      width: 36px; height: 36px;
+      background: var(--purple);
+      border: none;
+      border-radius: 9px;
+      color: #fff;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+      transition: background 0.2s;
+      align-self: flex-end;
+    }
+    .ai-send:hover { background: #5b21b6; }
+
+    /* FAB - AI toggle on mobile */
+    .ai-fab {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: var(--purple);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+      z-index: 300;
+      transition: transform 0.2s;
+    }
+    .ai-fab:hover { transform: scale(1.08); }
+
+    /* PROGRESS FOOTER */
+    .progress-footer {
+      position: sticky;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 100;
+    }
+
+    .pf-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .pf-bar { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .pf-fill { height: 100%; background: var(--purple); border-radius: 99px; transition: width 0.4s; width: 0%; }
+    .pf-pct { font-size: 12px; color: var(--purple-mid); font-weight: 500; white-space: nowrap; }
+
+    @media (max-width: 768px) {
+      .ai-sidebar { display: none; }
+      .ai-sidebar.mobile-open {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        width: 100%;
+        height: 70vh;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        border-radius: 20px 20px 0 0;
+        z-index: 400;
+      }
+      .ai-fab { display: flex; }
+      nav { padding: 0 16px; }
+      .feed { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-left">
+      <a class="back-btn" href="review.html"><i class="ti ti-arrow-left"></i></a>
+      <div>
+        <div class="nav-title">Physics Fundamentals <span class="mode-pill">Practice</span></div>
+        <div class="nav-sub" id="navSub">0 of 8 attempted</div>
+      </div>
+    </div>
+    <a class="logo-small" href="index.html">I<span>❤</span>Q</a>
+  </nav>
+
+  <div class="layout">
+
+    <!-- QUESTION FEED -->
+    <div class="feed" id="feed">
+      <div class="feed-inner" id="feedInner"></div>
+    </div>
+
+    <!-- AI SIDEBAR -->
+    <aside class="ai-sidebar" id="aiSidebar">
+      <div class="ai-header">
+        <div class="ai-header-left">
+          <div class="ai-icon-wrap"><i class="ti ti-robot"></i></div>
+          <div>
+            <div class="ai-title">AI Help</div>
+            <div class="ai-sub">Ask anything about your questions</div>
+          </div>
+        </div>
+        <button class="ai-close" onclick="toggleAI()"><i class="ti ti-x"></i></button>
+      </div>
+
+      <div class="ai-messages" id="aiMessages">
+        <div class="ai-msg bot">
+          Hey! I'm here to help you with any question. Ask me for hints, explanations, or tell me which question you're stuck on 👋
+          <div class="ai-msg-time">Just now</div>
+        </div>
+      </div>
+
+      <div class="ai-quick-chips">
+        <div class="chip" onclick="sendChip('Explain Q1')">Explain Q1</div>
+        <div class="chip" onclick="sendChip('Give me a hint')">Give hint</div>
+        <div class="chip" onclick="sendChip('Why is this the answer?')">Why this answer?</div>
+        <div class="chip" onclick="sendChip('Explain the concept')">Explain concept</div>
+      </div>
+
+      <div class="ai-input-wrap">
+        <textarea class="ai-input" id="aiInput" placeholder="Ask about any question..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+        ></textarea>
+        <button class="ai-send" onclick="sendMessage()"><i class="ti ti-send"></i></button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- PROGRESS FOOTER -->
+  <div class="progress-footer">
+    <span class="pf-label" id="pfLabel">0 / 8 attempted</span>
+    <div class="pf-bar"><div class="pf-fill" id="pfFill"></div></div>
+    <span class="pf-pct" id="pfPct">0%</span>
+  </div>
+
+  <!-- MOBILE FAB -->
+  <button class="ai-fab" id="aiFab" onclick="toggleAI()">
+    <i class="ti ti-robot"></i>
+  </button>
+
+  <script>
+    const QUESTIONS = [
+      { type: 'mcq', text: 'Which of the following is a vector quantity?', options: ['Speed', 'Velocity', 'Distance', 'Mass'] },
+      { type: 'mcq', text: 'The SI unit of electric potential is?', options: ['Ampere', 'Ohm', 'Volt', 'Watt'] },
+      { type: 'para', text: 'Explain the principle of conservation of energy with an example.' },
+      { type: 'mcq', text: "Newton's second law states that force equals?", options: ['Mass × Velocity', 'Mass × Acceleration', 'Mass × Distance', 'Mass × Speed'] },
+      { type: 'mcq', text: 'Which law explains the motion of planets around the sun?', options: ["Newton's law", "Kepler's law", "Ohm's law", "Boyle's law"] },
+      { type: 'para', text: 'State and prove the work-energy theorem.' },
+      { type: 'mcq', text: 'The speed of light in vacuum is approximately?', options: ['3×10⁶ m/s', '3×10⁸ m/s', '3×10¹⁰ m/s', '3×10¹² m/s'] },
+      { type: 'mcq', text: "Ohm's law states that current is proportional to?", options: ['Resistance', 'Power', 'Voltage', 'Frequency'] },
+    ];
+
+    const letters = ['A', 'B', 'C', 'D'];
+    let attempted = 0;
+    const total = QUESTIONS.length;
+    const attempted_set = new Set();
+
+    function updateProgress() {
+      const pct = Math.round((attempted / total) * 100);
+      document.getElementById('pfLabel').textContent = `${attempted} / ${total} attempted`;
+      document.getElementById('pfPct').textContent = pct + '%';
+      document.getElementById('pfFill').style.width = pct + '%';
+      document.getElementById('navSub').textContent = `${attempted} of ${total} attempted`;
+    }
+
+    function selectOption(cardIdx, optIdx) {
+      const card = document.getElementById(`card-${cardIdx}`);
+      const opts = card.querySelectorAll('.mcq-opt');
+      opts.forEach((o, i) => o.classList.toggle('selected', i === optIdx));
+      opts.forEach(o => {
+        const badge = o.querySelector('.opt-badge');
+        badge.style.background = o.classList.contains('selected') ? 'var(--purple)' : '';
+        badge.style.color = o.classList.contains('selected') ? '#fff' : '';
+      });
+      if (!attempted_set.has(cardIdx)) {
+        attempted_set.add(cardIdx);
+        attempted++;
+        card.classList.add('attempted');
+        updateProgress();
+      }
+    }
+
+    function buildCard(q, idx) {
+      const delay = idx * 0.07;
+      let body = '';
+
+      if (q.type === 'mcq') {
+        body = `<div class="mcq-opts">` +
+          q.options.map((opt, i) => `
+            <div class="mcq-opt" onclick="selectOption(${idx}, ${i})">
+              <div class="opt-badge">${letters[i]}</div>
+              ${opt}
+            </div>
+          `).join('') +
+        `</div>`;
+      } else {
+        body = `
+          <div class="para-hint">
+            <i class="ti ti-pencil" style="font-size:15px;flex-shrink:0"></i>
+            Think through your answer — use AI Help if you need a nudge
+          </div>
+        `;
+      }
+
+      return `
+        <div class="q-card" id="card-${idx}" style="animation-delay:${delay}s">
+          <div class="q-card-top">
+            <span class="q-num">Q${idx + 1}</span>
+            <span class="q-type ${q.type}">${q.type === 'mcq' ? 'MCQ' : 'Theory'}</span>
+            <span class="q-attempted-badge"><i class="ti ti-check" style="font-size:12px"></i> Attempted</span>
+          </div>
+          <div class="q-text">${q.text}</div>
+          ${body}
+        </div>
+      `;
+    }
+
+    document.getElementById('feedInner').innerHTML = QUESTIONS.map((q, i) => buildCard(q, i)).join('');
+    updateProgress();
+
+    // AI SIDEBAR
+    function toggleAI() {
+      const sidebar = document.getElementById('aiSidebar');
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        sidebar.classList.toggle('mobile-open');
+        sidebar.style.display = sidebar.classList.contains('mobile-open') ? 'flex' : 'none';
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+    }
+
+    const AI_RESPONSES = [
+      "Great question! Let me break this down for you. This concept relates to fundamental physics principles where the key distinction is between scalar and vector quantities.",
+      "Think about it this way — vectors have both magnitude AND direction, while scalars only have magnitude. That's the key to answering this one!",
+      "The formula you need here is from Newton's laws. Remember: F = ma, where F is force, m is mass, and a is acceleration.",
+      "For this theory question, structure your answer with: (1) Statement of the principle, (2) Mathematical expression if any, (3) A real-world example.",
+      "Hint: Think about what happens to energy when a ball is thrown upward. Where does the kinetic energy go at the top?",
+    ];
+    let aiResponseIdx = 0;
+
+    function addMessage(text, type) {
+      const msgs = document.getElementById('aiMessages');
+      const div = document.createElement('div');
+      div.className = `ai-msg ${type}`;
+      div.innerHTML = `${text}<div class="ai-msg-time">Just now</div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function showTyping() {
+      const msgs = document.getElementById('aiMessages');
+      const div = document.createElement('div');
+      div.className = 'ai-typing';
+      div.id = 'typing';
+      div.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function removeTyping() {
+      const t = document.getElementById('typing');
+      if (t) t.remove();
+    }
+
+    function sendChip(text) {
+      addMessage(text, 'user');
+      showTyping();
+      setTimeout(() => {
+        removeTyping();
+        addMessage(AI_RESPONSES[aiResponseIdx % AI_RESPONSES.length], 'bot');
+        aiResponseIdx++;
+      }, 1200);
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('aiInput');
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, 'user');
+      input.value = '';
+      showTyping();
+      setTimeout(() => {
+        removeTyping();
+        addMessage(AI_RESPONSES[aiResponseIdx % AI_RESPONSES.length], 'bot');
+        aiResponseIdx++;
+      }, 1200 + Math.random() * 600);
+    }
+  </script>
+
+</body>
+</html>

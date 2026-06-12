@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ILuvQ — Extracting Questions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --purple-mid: #c4b5fd;
+      --purple-dark: #5b21b6;
+      --bg: #f8f7ff;
+      --white: #ffffff;
+      --text: #1a1a2e;
+      --muted: #666680;
+      --border: #e8e4f8;
+      --green: #10b981;
+      --green-light: #ecfdf5;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 60px;
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--purple); }
+
+    .nav-file {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .nav-file i { font-size: 15px; color: var(--purple); }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .extract-card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 44px 40px;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(124,58,237,0.06);
+    }
+
+    .extract-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--purple-light);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+    .extract-icon i { font-size: 30px; color: var(--purple); }
+
+    .spinning {
+      position: absolute;
+      inset: -4px;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      border-top-color: var(--purple);
+      border-right-color: var(--purple-mid);
+      animation: spin 1.2s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .extract-card h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .extract-status {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      min-height: 20px;
+      transition: all 0.3s;
+    }
+    .extract-status span { color: var(--purple); font-weight: 500; }
+
+    /* PROGRESS BAR */
+    .progress-wrap {
+      margin-bottom: 28px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .progress-top strong { color: var(--text); font-weight: 500; }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--purple-light);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--purple-mid));
+      border-radius: 99px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 10px;
+    }
+
+    .stat-num {
+      font-family: 'Sora', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--purple);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* QUESTION PREVIEW */
+    .preview-section {
+      text-align: left;
+      margin-bottom: 28px;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preview-label .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 1s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .q-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--purple-mid) transparent;
+    }
+
+    .q-preview-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: slideIn 0.3s ease both;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .q-badge {
+      background: var(--purple-light);
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .q-badge.mcq { background: var(--purple-light); color: var(--purple); }
+    .q-badge.para { background: #fce7f3; color: #be185d; }
+
+    .q-text {
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 380px;
+    }
+
+    /* CHUNK TRACKER */
+    .chunks-wrap {
+      text-align: left;
+      margin-bottom: 24px;
+    }
+
+    .chunk-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .chunks-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chunk-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.3s;
+    }
+
+    .chunk-dot.done {
+      background: var(--green-light);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .chunk-dot.active {
+      background: var(--purple-light);
+      border-color: var(--purple);
+      color: var(--purple);
+      animation: pulseBorder 1s ease infinite;
+    }
+
+    @keyframes pulseBorder {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.3); }
+      50% { box-shadow: 0 0 0 4px rgba(124,58,237,0.1); }
+    }
+
+    /* DONE STATE */
+    .done-state { display: none; }
+    .done-state.active { display: block; }
+    .processing-state.hidden { display: none; }
+
+    .done-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--green-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .done-icon i { font-size: 32px; color: var(--green); }
+
+    .btn-continue {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 36px;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 11px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s;
+      text-decoration: none;
+      margin-top: 8px;
+    }
+    .btn-continue:hover { background: var(--purple-dark); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 16px; }
+      .extract-card { padding: 28px 20px; }
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="index.html">I<span>❤</span>Q</a>
+    <div class="nav-file">
+      <i class="ti ti-file-text"></i>
+      <span id="fileName">Physics_PYQ_2023.pdf</span>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="extract-card">
+
+      <!-- PROCESSING STATE -->
+      <div class="processing-state" id="processingState">
+        <div class="extract-icon">
+          <div class="spinning"></div>
+          <i class="ti ti-file-search"></i>
+        </div>
+
+        <h2>Extracting your questions</h2>
+        <p class="extract-status" id="statusText">
+          Reading page <span id="currentChunk">1</span> of <span id="totalChunks">10</span>...
+        </p>
+
+        <!-- PROGRESS BAR -->
+        <div class="progress-wrap">
+          <div class="progress-top">
+            <span>Progress</span>
+            <strong id="progressPct">0%</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num" id="qCount">0</div>
+            <div class="stat-label">Questions</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="mcqCount">0</div>
+            <div class="stat-label">MCQ</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="paraCount">0</div>
+            <div class="stat-label">Theory</div>
+          </div>
+        </div>
+
+        <!-- CHUNK TRACKER -->
+        <div class="chunks-wrap">
+          <div class="chunk-label">Pages processed</div>
+          <div class="chunks-row" id="chunksRow"></div>
+        </div>
+
+        <!-- LIVE PREVIEW -->
+        <div class="preview-section">
+          <div class="preview-label">
+            <div class="dot"></div>
+            Questions found so far
+          </div>
+          <div class="q-preview-list" id="qPreviewList"></div>
+        </div>
+      </div>
+
+      <!-- DONE STATE -->
+      <div class="done-state" id="doneState">
+        <div class="done-icon">
+          <i class="ti ti-check"></i>
+        </div>
+        <h2>Extraction complete!</h2>
+        <p class="extract-status">
+          Found <span id="finalCount">0</span> questions — ready to review
+        </p>
+
+        <div class="stats-row" style="margin-bottom: 28px;">
+          <div class="stat-box">
+            <div class="stat-num" id="finalTotal">0</div>
+            <div class="stat-label">Questions</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="finalMcq">0</div>
+            <div class="stat-label">MCQ</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="finalPara">0</div>
+            <div class="stat-label">Theory</div>
+          </div>
+        </div>
+
+        <a class="btn-continue" href="review.html">
+          Review answers
+          <i class="ti ti-arrow-right" style="font-size:16px"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const fileName = sessionStorage.getItem('uploadedFileName') || 'your_file.pdf';
+    document.getElementById('fileName').textContent = fileName;
+
+    const TOTAL_CHUNKS = 10;
+    const QUESTIONS_PER_CHUNK = [3, 4, 2, 5, 3, 4, 2, 3, 4, 3];
+    const SAMPLE_QUESTIONS = [
+      { type: 'mcq', text: 'Which of the following is a vector quantity?' },
+      { type: 'mcq', text: 'The unit of electric potential is?' },
+      { type: 'para', text: 'Explain the principle of conservation of energy.' },
+      { type: 'mcq', text: 'Newton\'s second law relates force to?' },
+      { type: 'para', text: 'Derive the expression for kinetic energy.' },
+      { type: 'mcq', text: 'Which law explains planetary motion?' },
+      { type: 'mcq', text: 'The speed of light in vacuum is approximately?' },
+      { type: 'para', text: 'State and prove the work-energy theorem.' },
+      { type: 'mcq', text: 'Ohm\'s law is valid for which type of conductors?' },
+      { type: 'mcq', text: 'Which particle has zero charge?' },
+      { type: 'para', text: 'Describe the photoelectric effect and its significance.' },
+      { type: 'mcq', text: 'The SI unit of magnetic flux density is?' },
+    ];
+
+    const chunksRow = document.getElementById('chunksRow');
+    const qPreviewList = document.getElementById('qPreviewList');
+    let totalQ = 0, totalMcq = 0, totalPara = 0;
+    let questionIndex = 0;
+
+    // Build chunk dots
+    for (let i = 1; i <= TOTAL_CHUNKS; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'chunk-dot';
+      dot.id = `chunk-${i}`;
+      dot.textContent = i;
+      chunksRow.appendChild(dot);
+    }
+
+    document.getElementById('totalChunks').textContent = TOTAL_CHUNKS;
+
+    function addQuestionPreview(q) {
+      const item = document.createElement('div');
+      item.className = 'q-preview-item';
+      item.innerHTML = `
+        <span class="q-badge ${q.type}">${q.type === 'mcq' ? 'MCQ' : 'Theory'}</span>
+        <span class="q-text">${q.text}</span>
+      `;
+      qPreviewList.appendChild(item);
+      qPreviewList.scrollTop = qPreviewList.scrollHeight;
+    }
+
+    function updateStats() {
+      document.getElementById('qCount').textContent = totalQ;
+      document.getElementById('mcqCount').textContent = totalMcq;
+      document.getElementById('paraCount').textContent = totalPara;
+    }
+
+    async function processChunk(chunkNum) {
+      const dot = document.getElementById(`chunk-${chunkNum}`);
+      dot.className = 'chunk-dot active';
+
+      document.getElementById('currentChunk').textContent = chunkNum;
+      document.getElementById('statusText').innerHTML =
+        `Reading page <span>${chunkNum}</span> of <span>${TOTAL_CHUNKS}</span>...`;
+
+      await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
+
+      const qInChunk = QUESTIONS_PER_CHUNK[chunkNum - 1];
+      for (let i = 0; i < qInChunk; i++) {
+        const q = SAMPLE_QUESTIONS[questionIndex % SAMPLE_QUESTIONS.length];
+        questionIndex++;
+        totalQ++;
+        if (q.type === 'mcq') totalMcq++; else totalPara++;
+        updateStats();
+        addQuestionPreview(q);
+        await new Promise(r => setTimeout(r, 180));
+      }
+
+      dot.className = 'chunk-dot done';
+      dot.innerHTML = '<i class="ti ti-check" style="font-size:12px"></i>';
+
+      const pct = Math.round((chunkNum / TOTAL_CHUNKS) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressPct').textContent = pct + '%';
+    }
+
+    async function runExtraction() {
+      for (let i = 1; i <= TOTAL_CHUNKS; i++) {
+        await processChunk(i);
+      }
+
+      // Save to sessionStorage for next pages
+      sessionStorage.setItem('totalQuestions', totalQ);
+      sessionStorage.setItem('totalMcq', totalMcq);
+      sessionStorage.setItem('totalPara', totalPara);
+
+      // Show done state
+      document.getElementById('processingState').classList.add('hidden');
+      document.getElementById('finalCount').textContent = totalQ;
+      document.getElementById('finalTotal').textContent = totalQ;
+      document.getElementById('finalMcq').textContent = totalMcq;
+      document.getElementById('finalPara').textContent = totalPara;
+      document.getElementById('doneState').classList.add('active');
+    }
+
+    runExtraction();
+  </script>
+
+</body>
+</html>

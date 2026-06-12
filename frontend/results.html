@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ILuvQ — Results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0e17;
+      --surface: #1a1826;
+      --surface2: #221f30;
+      --border: #2a2840;
+      --purple: #7c3aed;
+      --purple-light: #2d1f52;
+      --purple-mid: #a78bfa;
+      --text: #fffffe;
+      --muted: #8b8aab;
+      --green: #10b981;
+      --green-light: #0d2b22;
+      --green-border: #065f46;
+      --red: #ef4444;
+      --red-light: #2b0d0d;
+      --red-border: #7f1d1d;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    nav {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 56px; flex-shrink: 0;
+    }
+    .logo { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--purple-mid); }
+    .btn-retake {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 18px; background: var(--purple); color: #fff;
+      border: none; border-radius: 9px; font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s;
+      text-decoration: none;
+    }
+    .btn-retake:hover { background: #5b21b6; }
+
+    .main { flex: 1; max-width: 720px; margin: 0 auto; width: 100%; padding: 32px 24px; }
+
+    /* SCORE CARD */
+    .score-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px 32px; text-align: center;
+      margin-bottom: 28px; animation: fadeUp 0.5s ease both;
+      position: relative; overflow: hidden;
+    }
+    .score-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    .score-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
+
+    .score-title {
+      font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 800;
+      margin-bottom: 6px; color: var(--text);
+    }
+    .score-sub { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
+
+    .score-big {
+      font-family: 'Sora', sans-serif; font-size: 72px; font-weight: 800;
+      line-height: 1; margin-bottom: 4px;
+      background: linear-gradient(135deg, var(--purple-mid), #e879f9);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .score-out { font-size: 18px; color: var(--muted); margin-bottom: 24px; }
+
+    .score-stats {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px;
+    }
+    .score-stat {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 10px;
+    }
+    .score-stat .st-num { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700; }
+    .score-stat .st-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+    .st-correct { color: var(--green); }
+    .st-wrong { color: var(--red); }
+    .st-skip { color: var(--muted); }
+
+    .score-bar-wrap { margin-bottom: 8px; }
+    .score-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .score-bar { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .score-bar-fill { height: 100%; border-radius: 99px; transition: width 1s ease 0.3s; width: 0%; }
+    .fill-green { background: linear-gradient(90deg, var(--green), #34d399); }
+
+    .score-action-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+    .btn-action {
+      display: flex; align-items: center; gap: 7px;
+      padding: 11px 22px; border-radius: 10px; font-size: 14px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+      text-decoration: none; border: none;
+    }
+    .btn-action.primary { background: var(--purple); color: #fff; }
+    .btn-action.primary:hover { background: #5b21b6; }
+    .btn-action.ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+    .btn-action.ghost:hover { border-color: var(--purple); color: var(--purple-mid); }
+
+    /* SECTION HEADER */
+    .section-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+    .section-header h3 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 600; }
+    .section-badge { font-size: 11px; color: var(--muted); background: var(--surface2); padding: 3px 10px; border-radius: 6px; border: 1px solid var(--border); }
+
+    /* QUESTION CARDS */
+    .q-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 20px; margin-bottom: 12px;
+      animation: fadeUp 0.4s ease both;
+    }
+    .q-card.correct { border-color: var(--green-border); background: #0a1f18; }
+    .q-card.wrong { border-color: var(--red-border); }
+    .q-card.skipped { border-color: var(--border); opacity: 0.7; }
+
+    .q-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .q-num { font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); background: var(--surface2); padding: 3px 9px; border-radius: 6px; border: 1px solid var(--border); }
+    .q-type { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 6px; }
+    .q-type.mcq { background: var(--purple-light); color: var(--purple-mid); }
+    .q-type.para { background: #2d0a1f; color: #f9a8d4; }
+    .result-badge { margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 6px; }
+    .result-badge.correct { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+    .result-badge.wrong { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+    .result-badge.skipped { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+    .q-text { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.55; margin-bottom: 16px; }
+
+    .mcq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .mcq-opt { display: flex; align-items: center; gap: 9px; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--muted); }
+    .mcq-opt.correct { border-color: var(--green); background: var(--green-light); color: #6ee7b7; }
+    .mcq-opt.wrong { border-color: var(--red); background: var(--red-light); color: #fca5a5; opacity: 0.85; }
+    .opt-badge { width: 26px; height: 26px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; font-family: 'Sora', sans-serif; }
+    .mcq-opt.correct .opt-badge { background: var(--green); color: #fff; }
+    .mcq-opt.wrong .opt-badge { background: var(--red); color: #fff; }
+
+    .ai-explain {
+      display: flex; align-items: flex-start; gap: 8px;
+      background: var(--purple-light); border: 1px solid var(--purple);
+      border-radius: 9px; padding: 11px 13px; font-size: 13px;
+      color: var(--purple-mid); line-height: 1.55;
+    }
+    .ai-explain i { font-size: 16px; flex-shrink: 0; margin-top: 1px; color: var(--purple-mid); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 14px; }
+      .main { padding: 20px 14px; }
+      .score-card { padding: 24px 18px; }
+      .score-big { font-size: 56px; }
+      .mcq-opts { grid-template-columns: 1fr; }
+      .score-stats { grid-template-columns: repeat(3,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="index.html">I<span>❤</span>Q</a>
+    <a class="btn-retake" href="test.html">
+      <i class="ti ti-refresh" style="font-size:14px"></i>
+      Retake Test
+    </a>
+  </nav>
+
+  <div class="main">
+
+    <!-- SCORE CARD -->
+    <div class="score-card" id="scoreCard">
+      <span class="score-emoji" id="scoreEmoji">🎯</span>
+      <div class="score-title" id="scoreTitle">Great work!</div>
+      <div class="score-sub" id="scoreSub">Here's how you performed</div>
+      <div class="score-big" id="scoreBig">0%</div>
+      <div class="score-out" id="scoreOut">0 out of 0 correct</div>
+      <div class="score-stats">
+        <div class="score-stat"><div class="st-num st-correct" id="stCorrect">0</div><div class="st-label">Correct</div></div>
+        <div class="score-stat"><div class="st-num st-wrong" id="stWrong">0</div><div class="st-label">Wrong</div></div>
+        <div class="score-stat"><div class="st-num st-skip" id="stSkip">0</div><div class="st-label">Skipped</div></div>
+      </div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-label"><span>Score</span><span id="barPct">0%</span></div>
+        <div class="score-bar"><div class="score-bar-fill fill-green" id="scoreFill"></div></div>
+      </div>
+      <div class="score-action-btns">
+        <a class="btn-action primary" href="test.html">
+          <i class="ti ti-refresh" style="font-size:15px"></i>Retake
+        </a>
+        <a class="btn-action ghost" href="practice.html">
+          <i class="ti ti-book-2" style="font-size:15px"></i>Practice instead
+        </a>
+        <a class="btn-action ghost" href="index.html">
+          <i class="ti ti-upload" style="font-size:15px"></i>New PDF
+        </a>
+      </div>
+    </div>
+
+    <!-- QUESTIONS REVIEW -->
+    <div class="section-header">
+      <h3>Question Review</h3>
+      <span class="section-badge" id="reviewBadge">0 questions</span>
+    </div>
+
+    <div id="questionsContainer"></div>
+
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      { type:'mcq', text:'Which of the following is a vector quantity?', options:['Speed','Velocity','Distance','Mass'], correct:1, aiAnswer:'Velocity has both magnitude and direction — making it a vector quantity unlike speed which is scalar.' },
+      { type:'mcq', text:'The SI unit of electric potential is?', options:['Ampere','Ohm','Volt','Watt'], correct:2, aiAnswer:'Electric potential is measured in Volts (V), named after Alessandro Volta.' },
+      { type:'para', text:'Explain the principle of conservation of energy with an example.', options:[], correct:null, aiAnswer:'Energy cannot be created or destroyed, only converted. Example: A falling ball converts potential energy to kinetic energy.' },
+      { type:'mcq', text:"Newton's second law states that force equals?", options:['Mass × Velocity','Mass × Acceleration','Mass × Distance','Mass × Speed'], correct:1, aiAnswer:"F = ma — Force equals mass multiplied by acceleration." },
+      { type:'mcq', text:'Which law explains the motion of planets around the sun?', options:["Newton's law","Kepler's law","Ohm's law","Boyle's law"], correct:1, aiAnswer:"Kepler's three laws describe elliptical orbits, speed variation, and orbital periods." },
+      { type:'para', text:'State and prove the work-energy theorem.', options:[], correct:null, aiAnswer:'W = ΔKE = ½mv² − ½mu². Net work equals change in kinetic energy.' },
+      { type:'mcq', text:'The speed of light in vacuum is approximately?', options:['3×10⁶ m/s','3×10⁸ m/s','3×10¹⁰ m/s','3×10¹² m/s'], correct:1, aiAnswer:'c ≈ 3×10⁸ m/s (300,000 km/s). A fundamental physical constant.' },
+      { type:'mcq', text:"Ohm's law states that current is proportional to?", options:['Resistance','Power','Voltage','Frequency'], correct:2, aiAnswer:'V = IR — current is directly proportional to voltage at constant resistance.' },
+    ];
+
+    const letters = ['A','B','C','D'];
+
+    const score = parseInt(sessionStorage.getItem('score')) ?? 5;
+    const total = parseInt(sessionStorage.getItem('total')) ?? QUESTIONS.length;
+    const answered = parseInt(sessionStorage.getItem('answered')) ?? 6;
+
+    const mcqQuestions = QUESTIONS.filter(q => q.type === 'mcq');
+    const wrong = Math.max(0, answered - score);
+    const skipped = total - answered;
+    const pct = Math.round((score / mcqQuestions.length) * 100);
+
+    // Fake user answers for demo
+    const demoAnswers = { 0: 1, 1: 0, 3: 1, 4: 1, 6: 2, 7: 2 };
+
+    // Score card
+    document.getElementById('scoreBig').textContent = pct + '%';
+    document.getElementById('scoreOut').textContent = `${score} out of ${mcqQuestions.length} correct (MCQ)`;
+    document.getElementById('stCorrect').textContent = score;
+    document.getElementById('stWrong').textContent = wrong;
+    document.getElementById('stSkip').textContent = skipped;
+    document.getElementById('barPct').textContent = pct + '%';
+    document.getElementById('reviewBadge').textContent = `${total} questions`;
+
+    let emoji = '🎯', title = 'Great work!', sub = 'Keep pushing forward!';
+    if (pct >= 90) { emoji = '🏆'; title = 'Outstanding!'; sub = 'You absolutely crushed it!'; }
+    else if (pct >= 70) { emoji = '🎯'; title = 'Great work!'; sub = 'You\'re on the right track!'; }
+    else if (pct >= 50) { emoji = '📚'; title = 'Good effort!'; sub = 'A bit more practice and you\'ll nail it!'; }
+    else { emoji = '💪'; title = 'Keep going!'; sub = 'Practice more — you\'ve got this!'; }
+
+    document.getElementById('scoreEmoji').textContent = emoji;
+    document.getElementById('scoreTitle').textContent = title;
+    document.getElementById('scoreSub').textContent = sub;
+
+    setTimeout(() => {
+      document.getElementById('scoreFill').style.width = pct + '%';
+    }, 100);
+
+    // Build question cards
+    const container = document.getElementById('questionsContainer');
+    QUESTIONS.forEach((q, idx) => {
+      const userAns = demoAnswers[idx];
+      let resultClass = 'skipped', resultLabel = 'Skipped', resultIcon = 'ti-minus';
+
+      if (q.type === 'mcq') {
+        if (userAns === undefined) { resultClass = 'skipped'; resultLabel = 'Skipped'; resultIcon = 'ti-minus'; }
+        else if (userAns === q.correct) { resultClass = 'correct'; resultLabel = 'Correct'; resultIcon = 'ti-check'; }
+        else { resultClass = 'wrong'; resultLabel = 'Wrong'; resultIcon = 'ti-x'; }
+      } else {
+        resultClass = 'skipped'; resultLabel = 'Theory'; resultIcon = 'ti-book';
+      }
+
+      let optionsHTML = '';
+      if (q.type === 'mcq') {
+        optionsHTML = `<div class="mcq-opts">` +
+          q.options.map((opt, i) => {
+            let cls = '';
+            if (i === q.correct) cls = 'correct';
+            else if (i === userAns && userAns !== q.correct) cls = 'wrong';
+            return `<div class="mcq-opt ${cls}"><div class="opt-badge">${letters[i]}</div>${opt}</div>`;
+          }).join('') +
+        `</div>`;
+      }
+
+      const card = document.createElement('div');
+      card.className = `q-card ${resultClass}`;
+      card.style.animationDelay = `${idx * 0.07}s`;
+      card.innerHTML = `
+        <div class="q-card-top">
+          <span class="q-num">Q${idx+1}</span>
+          <span class="q-type ${q.type}">${q.type==='mcq'?'MCQ':'Theory'}</span>
+          <span class="result-badge ${resultClass}">
+            <i class="ti ${resultIcon}" style="font-size:11px"></i>${resultLabel}
+          </span>
+        </div>
+        <div class="q-text">${q.text}</div>
+        ${optionsHTML}
+        <div class="ai-explain">
+          <i class="ti ti-robot"></i>
+          <span>${q.aiAnswer}</span>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>

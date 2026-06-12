@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ILuvQ — Review Answers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --purple-mid: #c4b5fd;
+      --purple-dark: #5b21b6;
+      --bg: #f8f7ff;
+      --white: #ffffff;
+      --text: #1a1a2e;
+      --muted: #666680;
+      --border: #e8e4f8;
+      --green: #10b981;
+      --green-light: #ecfdf5;
+      --green-border: #6ee7b7;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 60px;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--purple); }
+
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .nav-center strong { color: var(--text); font-weight: 500; }
+
+    .btn { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; border-radius: 9px; padding: 8px 20px; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-primary { background: var(--purple); color: #fff; display: flex; align-items: center; gap: 6px; }
+    .btn-primary:hover { background: var(--purple-dark); }
+
+    /* LAYOUT */
+    .layout {
+      display: flex;
+      flex: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 28px 24px;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 88px;
+    }
+
+    .sidebar-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .sidebar-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row span { color: var(--muted); }
+    .stat-row strong { font-weight: 600; color: var(--text); }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .progress-mini {
+      margin-top: 10px;
+    }
+    .progress-mini-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .progress-mini-bar {
+      height: 5px;
+      background: var(--purple-light);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-mini-fill {
+      height: 100%;
+      background: var(--purple);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .btn-start-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-practice {
+      background: var(--purple-light);
+      color: var(--purple);
+    }
+    .btn-practice:hover { background: var(--purple-mid); }
+
+    .btn-test {
+      background: var(--purple);
+      color: #fff;
+    }
+    .btn-test:hover { background: var(--purple-dark); }
+
+    /* MAIN CONTENT */
+    .content { flex: 1; min-width: 0; }
+
+    .page-header {
+      margin-bottom: 20px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .page-header p { font-size: 14px; color: var(--muted); }
+
+    /* PAGE GROUP */
+    .page-group {
+      margin-bottom: 28px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .page-group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-badge {
+      background: var(--purple-light);
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-family: 'Sora', sans-serif;
+    }
+
+    .page-group-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .page-q-count {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    /* QUESTION CARD */
+    .q-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .q-card:hover { border-color: var(--purple-mid); }
+    .q-card.confirmed { border-color: var(--green-border); background: #fafffe; }
+
+    .q-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .q-num-badge {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      font-family: 'Sora', sans-serif;
+    }
+
+    .q-type-badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .q-type-badge.mcq { background: var(--purple-light); color: var(--purple); }
+    .q-type-badge.para { background: #fce7f3; color: #be185d; }
+
+    .q-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .q-action-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s;
+    }
+    .q-action-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-light); }
+    .q-action-btn.confirm-btn.active { background: var(--green-light); border-color: var(--green); color: var(--green); }
+
+    .q-text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    /* MCQ OPTIONS */
+    .mcq-opts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .mcq-opt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mcq-opt:hover { border-color: var(--purple-mid); background: var(--purple-light); }
+    .mcq-opt.correct { border-color: var(--green); background: var(--green-light); }
+
+    .opt-letter {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      font-family: 'Sora', sans-serif;
+    }
+    .mcq-opt.correct .opt-letter { background: var(--green); border-color: var(--green); color: #fff; }
+
+    /* AI SUGGESTION */
+    .ai-suggest {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: var(--purple-light);
+      border: 1px solid var(--purple-mid);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--purple-dark);
+      margin-bottom: 10px;
+    }
+    .ai-suggest i { font-size: 15px; flex-shrink: 0; margin-top: 1px; color: var(--purple); }
+
+    /* PREFETCH INDICATOR */
+    .prefetch-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 10px 14px;
+      background: var(--white);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .prefetch-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 1s ease infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; padding: 16px; }
+      .sidebar { width: 100%; position: static; }
+      .mcq-opts { grid-template-columns: 1fr; }
+      nav { padding: 0 16px; }
+      .nav-center { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="index.html">I<span>❤</span>Q</a>
+    <div class="nav-center">
+      <i class="ti ti-check-circle" style="color:var(--green);font-size:16px"></i>
+      <strong>Extraction complete</strong>
+      <span>· Review and confirm answers</span>
+    </div>
+    <button class="btn btn-primary" onclick="window.location.href='test.html'">
+      Start test
+      <i class="ti ti-arrow-right" style="font-size:14px"></i>
+    </button>
+  </nav>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">Summary</div>
+        <div class="stat-row"><span>Total questions</span><strong id="sTotal">0</strong></div>
+        <div class="stat-row"><span>MCQ</span><strong id="sMcq">0</strong></div>
+        <div class="stat-row"><span>Theory</span><strong id="sPara">0</strong></div>
+        <div class="stat-row"><span>Confirmed</span><strong id="sConfirmed" style="color:var(--green)">0</strong></div>
+
+        <div class="progress-mini">
+          <div class="progress-mini-label">
+            <span>Review progress</span>
+            <span id="reviewPct">0%</span>
+          </div>
+          <div class="progress-mini-bar">
+            <div class="progress-mini-fill" id="reviewFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Legend</div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--green)"></div>
+          Confirmed answer
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--purple)"></div>
+          AI suggested
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--border)"></div>
+          Pending review
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Ready to go?</div>
+        <div class="btn-start-wrap">
+          <button class="btn-full btn-practice" onclick="window.location.href='practice.html'">
+            <i class="ti ti-book-2" style="font-size:15px"></i>
+            Practice mode
+          </button>
+          <button class="btn-full btn-test" onclick="window.location.href='test.html'">
+            <i class="ti ti-clock" style="font-size:15px"></i>
+            Test mode
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <div class="page-header">
+        <h1>Review extracted questions</h1>
+        <p>AI has suggested correct answers — confirm or change them before starting.</p>
+      </div>
+
+      <div id="questionsContainer"></div>
+    </main>
+
+  </div>
+
+  <script>
+    const totalQ = parseInt(sessionStorage.getItem('totalQuestions')) || 12;
+    const totalMcq = parseInt(sessionStorage.getItem('totalMcq')) || 8;
+    const totalPara = parseInt(sessionStorage.getItem('totalPara')) || 4;
+
+    document.getElementById('sTotal').textContent = totalQ;
+    document.getElementById('sMcq').textContent = totalMcq;
+    document.getElementById('sPara').textContent = totalPara;
+
+    const SAMPLE_DATA = [
+      {
+        page: 1, type: 'mcq',
+        question: 'Which of the following is a vector quantity?',
+        options: ['Speed', 'Velocity', 'Distance', 'Mass'],
+        aiAnswer: 1,
+        aiReason: 'Velocity has both magnitude and direction, making it a vector quantity.'
+      },
+      {
+        page: 1, type: 'mcq',
+        question: 'The SI unit of electric potential is?',
+        options: ['Ampere', 'Ohm', 'Volt', 'Watt'],
+        aiAnswer: 2,
+        aiReason: 'Electric potential is measured in Volts (V), named after Alessandro Volta.'
+      },
+      {
+        page: 1, type: 'para',
+        question: 'Explain the principle of conservation of energy with an example.',
+        options: [],
+        aiAnswer: null,
+        aiReason: 'Energy cannot be created or destroyed, only converted from one form to another. Example: A falling ball converts potential energy to kinetic energy.'
+      },
+      {
+        page: 2, type: 'mcq',
+        question: "Newton's second law of motion states that force is equal to?",
+        options: ['Mass × Velocity', 'Mass × Acceleration', 'Mass × Distance', 'Mass × Speed'],
+        aiAnswer: 1,
+        aiReason: 'F = ma — Force equals mass multiplied by acceleration.'
+      },
+      {
+        page: 2, type: 'mcq',
+        question: 'Which law explains the motion of planets around the sun?',
+        options: ["Newton's law", "Kepler's law", "Ohm's law", "Boyle's law"],
+        aiAnswer: 1,
+        aiReason: "Kepler's laws of planetary motion describe how planets orbit the sun in elliptical paths."
+      },
+      {
+        page: 2, type: 'para',
+        question: 'State and prove the work-energy theorem.',
+        options: [],
+        aiAnswer: null,
+        aiReason: 'The work-energy theorem states that the net work done on an object equals the change in its kinetic energy: W = ΔKE = ½mv² - ½mu²'
+      },
+      {
+        page: 3, type: 'mcq',
+        question: 'The speed of light in vacuum is approximately?',
+        options: ['3×10⁶ m/s', '3×10⁸ m/s', '3×10¹⁰ m/s', '3×10¹² m/s'],
+        aiAnswer: 1,
+        aiReason: 'The speed of light in vacuum (c) is approximately 3×10⁸ m/s or 300,000 km/s.'
+      },
+      {
+        page: 3, type: 'mcq',
+        question: "Ohm's law states that current is proportional to?",
+        options: ['Resistance', 'Power', 'Voltage', 'Frequency'],
+        aiAnswer: 2,
+        aiReason: 'V = IR — Current (I) is directly proportional to Voltage (V) at constant resistance.'
+      },
+    ];
+
+    let confirmedCount = 0;
+    const totalCards = SAMPLE_DATA.length;
+
+    function updateProgress() {
+      document.getElementById('sConfirmed').textContent = confirmedCount;
+      const pct = Math.round((confirmedCount / totalCards) * 100);
+      document.getElementById('reviewPct').textContent = pct + '%';
+      document.getElementById('reviewFill').style.width = pct + '%';
+    }
+
+    function buildCard(q, idx) {
+      const card = document.createElement('div');
+      card.className = 'q-card';
+      card.id = `card-${idx}`;
+
+      let optionsHTML = '';
+      if (q.type === 'mcq') {
+        const letters = ['A', 'B', 'C', 'D'];
+        optionsHTML = `<div class="mcq-opts">` +
+          q.options.map((opt, i) => `
+            <div class="mcq-opt ${i === q.aiAnswer ? 'correct' : ''}" data-card="${idx}" data-opt="${i}" onclick="selectOption(${idx}, ${i})">
+              <div class="opt-letter">${letters[i]}</div>
+              ${opt}
+            </div>
+          `).join('') +
+        `</div>`;
+      }
+
+      const aiBox = `
+        <div class="ai-suggest">
+          <i class="ti ti-robot"></i>
+          <div><strong>AI suggests:</strong> ${q.type === 'mcq' ? q.options[q.aiAnswer] : ''} — ${q.aiReason}</div>
+        </div>
+      `;
+
+      card.innerHTML = `
+        <div class="q-card-header">
+          <span class="q-num-badge">Q${idx + 1}</span>
+          <span class="q-type-badge ${q.type}">${q.type === 'mcq' ? 'MCQ' : 'Theory'}</span>
+          <div class="q-actions">
+            <button class="q-action-btn" title="Edit question" onclick="alert('Edit coming soon!')">
+              <i class="ti ti-pencil"></i>
+            </button>
+            <button class="q-action-btn confirm-btn" id="confirm-${idx}" title="Confirm answer" onclick="confirmCard(${idx})">
+              <i class="ti ti-check"></i>
+            </button>
+          </div>
+        </div>
+        <div class="q-text">${q.question}</div>
+        ${optionsHTML}
+        ${aiBox}
+      `;
+
+      return card;
+    }
+
+    function selectOption(cardIdx, optIdx) {
+      const card = document.getElementById(`card-${cardIdx}`);
+      const opts = card.querySelectorAll('.mcq-opt');
+      opts.forEach((o, i) => {
+        o.classList.toggle('correct', i === optIdx);
+        o.querySelector('.opt-letter').style.background = i === optIdx ? 'var(--green)' : '';
+        o.querySelector('.opt-letter').style.borderColor = i === optIdx ? 'var(--green)' : '';
+        o.querySelector('.opt-letter').style.color = i === optIdx ? '#fff' : '';
+      });
+    }
+
+    function confirmCard(idx) {
+      const card = document.getElementById(`card-${idx}`);
+      const btn = document.getElementById(`confirm-${idx}`);
+      if (!card.classList.contains('confirmed')) {
+        card.classList.add('confirmed');
+        btn.classList.add('active');
+        confirmedCount++;
+        updateProgress();
+      }
+    }
+
+    // Group questions by page
+    const pages = {};
+    SAMPLE_DATA.forEach((q, idx) => {
+      if (!pages[q.page]) pages[q.page] = [];
+      pages[q.page].push({ q, idx });
+    });
+
+    const container = document.getElementById('questionsContainer');
+    let pageNum = 0;
+
+    Object.entries(pages).forEach(([page, items], groupIdx) => {
+      pageNum++;
+      const group = document.createElement('div');
+      group.className = 'page-group';
+      group.style.animationDelay = `${groupIdx * 0.1}s`;
+
+      const header = document.createElement('div');
+      header.className = 'page-group-header';
+      header.innerHTML = `
+        <span class="page-badge">Page ${page}</span>
+        <span class="page-group-title">Questions from page ${page}</span>
+        <span class="page-q-count">${items.length} question${items.length > 1 ? 's' : ''}</span>
+      `;
+      group.appendChild(header);
+
+      // Prefetch indicator (except last group)
+      if (groupIdx < Object.keys(pages).length - 1) {
+        const prefetch = document.createElement('div');
+        prefetch.className = 'prefetch-bar';
+        prefetch.innerHTML = `<div class="prefetch-dot"></div> Prefetching answers for page ${parseInt(page) + 1}...`;
+        group.appendChild(prefetch);
+        setTimeout(() => prefetch.remove(), 2000 + groupIdx * 1000);
+      }
+
+      items.forEach(({ q, idx }) => {
+        group.appendChild(buildCard(q, idx));
+      });
+
+      container.appendChild(group);
+    });
+
+    updateProgress();
+  </script>
+
+</body>
+</html>

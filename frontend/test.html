@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ILuvQ — Test Mode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0e17;
+      --surface: #1a1826;
+      --surface2: #221f30;
+      --border: #2a2840;
+      --purple: #7c3aed;
+      --purple-light: #2d1f52;
+      --purple-mid: #a78bfa;
+      --text: #fffffe;
+      --muted: #8b8aab;
+      --green: #10b981;
+      --green-light: #0d2b22;
+      --green-border: #065f46;
+      --red: #ef4444;
+      --red-light: #2b0d0d;
+      --red-border: #7f1d1d;
+      --orange: #f59e0b;
+      --orange-light: #2d1a00;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 56px; flex-shrink: 0;
+    }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .hamburger {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+      transition: all 0.2s;
+    }
+    .hamburger:hover { color: var(--text); border-color: var(--purple); }
+    .nav-title { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; }
+    .nav-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .mode-pill { padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 500; background: #2d1b4e; color: var(--purple-mid); border: 1px solid var(--purple-light); }
+    .timer-wrap {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 7px 14px; border-radius: 9px;
+      font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--purple-mid);
+      transition: all 0.3s;
+    }
+    .timer-wrap.warning { color: var(--orange); border-color: var(--orange); background: var(--orange-light); }
+    .timer-wrap.danger { color: var(--red); border-color: var(--red); background: var(--red-light); animation: timerPulse 1s ease infinite; }
+    @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+    /* SETUP SCREEN */
+    .setup-screen {
+      flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .setup-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 40px 36px; max-width: 480px; width: 100%;
+      text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .setup-icon { width: 60px; height: 60px; background: var(--purple-light); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+    .setup-icon i { font-size: 28px; color: var(--purple-mid); }
+    .setup-card h2 { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .setup-card p { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .timer-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .timer-opt {
+      padding: 14px 10px; background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 11px; cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .timer-opt:hover { border-color: var(--purple); background: var(--purple-light); }
+    .timer-opt.selected { border-color: var(--purple); background: var(--purple-light); }
+    .timer-opt .t-min { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--purple-mid); }
+    .timer-opt .t-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .custom-time-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .custom-time-wrap label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .custom-input {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; padding: 9px 12px; font-size: 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; outline: none;
+    }
+    .custom-input:focus { border-color: var(--purple); }
+    .btn-start-test {
+      width: 100%; padding: 14px; background: var(--purple); color: #fff;
+      border: none; border-radius: 11px; font-size: 16px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-start-test:hover { background: #5b21b6; }
+
+    /* TEST SCREEN */
+    .test-screen { display: none; flex: 1; flex-direction: column; }
+    .test-screen.active { display: flex; }
+
+    .feed { flex: 1; overflow-y: auto; padding: 24px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .feed-inner { max-width: 680px; margin: 0 auto; }
+
+    .q-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 24px; margin-bottom: 16px;
+      transition: border-color 0.2s; animation: fadeUp 0.4s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .q-card.answered { border-color: var(--purple); }
+    .q-card.correct-reveal { border-color: var(--green); background: #0a1f18; }
+    .q-card.wrong-reveal { border-color: var(--red); }
+
+    .q-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .q-num { font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); background: var(--surface2); padding: 3px 9px; border-radius: 6px; border: 1px solid var(--border); }
+    .q-type { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 6px; }
+    .q-type.mcq { background: var(--purple-light); color: var(--purple-mid); }
+    .q-type.para { background: #2d0a1f; color: #f9a8d4; }
+    .q-text { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 500; color: var(--text); line-height: 1.55; margin-bottom: 20px; }
+
+    .mcq-opts { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+    .mcq-opt {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px; background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 11px;
+      cursor: pointer; transition: all 0.15s; font-size: 14px; color: #ccc;
+    }
+    .mcq-opt:hover { border-color: var(--purple); background: var(--purple-light); color: var(--text); }
+    .mcq-opt.selected { border-color: var(--purple); background: var(--purple-light); color: var(--text); }
+    .mcq-opt.reveal-correct { border-color: var(--green) !important; background: var(--green-light) !important; color: #6ee7b7 !important; opacity: 1 !important; }
+    .mcq-opt.reveal-wrong { border-color: var(--red) !important; background: var(--red-light) !important; color: #fca5a5 !important; opacity: 0.8; }
+
+    .opt-badge {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      flex-shrink: 0; transition: all 0.15s; font-family: 'Sora', sans-serif;
+    }
+    .mcq-opt.selected .opt-badge { background: var(--purple); color: #fff; }
+    .mcq-opt.reveal-correct .opt-badge { background: var(--green); color: #fff; }
+    .mcq-opt.reveal-wrong .opt-badge { background: var(--red); color: #fff; }
+
+    /* HIDDEN AI ANSWER BOX */
+    .ai-answer-box {
+      background: var(--surface2); border: 1px dashed var(--border);
+      border-radius: 10px; padding: 13px 16px; margin-bottom: 14px;
+      min-height: 48px; display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--muted); font-style: italic;
+      transition: all 0.4s;
+    }
+    .ai-answer-box.revealed {
+      background: var(--purple-light); border: 1px solid var(--purple);
+      color: var(--purple-mid); font-style: normal;
+    }
+    .ai-answer-box i { font-size: 15px; flex-shrink: 0; }
+
+    .q-divider { height: 1px; background: var(--border); margin: 4px 0 16px; }
+
+    /* SUBMIT AREA */
+    .submit-area {
+      max-width: 680px; margin: 0 auto 32px;
+      text-align: center;
+    }
+    .submit-stats {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px;
+    }
+    .submit-stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 10px; text-align: center;
+    }
+    .submit-stat .ss-num { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700; }
+    .submit-stat .ss-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+    .ss-answered { color: var(--purple-mid); }
+    .ss-unattempted { color: var(--orange); }
+    .ss-total { color: var(--muted); }
+
+    .btn-submit {
+      padding: 15px 48px; background: var(--purple); color: #fff;
+      border: none; border-radius: 12px; font-size: 17px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.2s; box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    }
+    .btn-submit:hover { background: #5b21b6; transform: translateY(-1px); }
+
+    /* PROGRESS FOOTER */
+    .progress-footer {
+      position: sticky; bottom: 0;
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 10px 24px; display: flex; align-items: center; gap: 14px; z-index: 100;
+    }
+    .pf-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .pf-bar { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .pf-fill { height: 100%; background: var(--purple); border-radius: 99px; transition: width 0.4s; width: 0%; }
+    .pf-pct { font-size: 12px; color: var(--purple-mid); font-weight: 500; white-space: nowrap; }
+
+    /* REVIEW DRAWER */
+    .drawer-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 300;
+    }
+    .drawer-overlay.active { display: block; }
+
+    .review-drawer {
+      position: fixed; top: 0; left: -320px; bottom: 0;
+      width: 300px; background: var(--surface);
+      border-right: 1px solid var(--border);
+      z-index: 400; transition: left 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    .review-drawer.open { left: 0; }
+
+    .drawer-header {
+      padding: 16px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .drawer-title { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; }
+    .drawer-close {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+
+    .drawer-legend {
+      padding: 12px 18px; border-bottom: 1px solid var(--border);
+      display: flex; gap: 14px; flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+    .drawer-grid {
+      flex: 1; overflow-y: auto; padding: 16px 18px;
+      display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start;
+    }
+
+    .drawer-q-btn {
+      width: 40px; height: 40px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: 'Sora', sans-serif; transition: all 0.15s;
+      border: 1.5px solid var(--border); background: var(--surface2); color: var(--muted);
+    }
+    .drawer-q-btn:hover { border-color: var(--purple); color: var(--purple-mid); }
+    .drawer-q-btn.answered { background: var(--purple-light); border-color: var(--purple); color: var(--purple-mid); }
+    .drawer-q-btn.visited { background: var(--orange-light); border-color: var(--orange); color: var(--orange); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 12px; }
+      .feed { padding: 14px; }
+      .timer-options { grid-template-columns: repeat(3,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-left">
+      <button class="hamburger" onclick="toggleDrawer()"><i class="ti ti-menu-2"></i></button>
+      <div>
+        <div class="nav-title">Physics Fundamentals &nbsp;<span class="mode-pill">Test</span></div>
+        <div class="nav-sub" id="navSub">Set your timer to begin</div>
+      </div>
+    </div>
+    <div class="timer-wrap" id="timerWrap">
+      <i class="ti ti-clock" style="font-size:16px"></i>
+      <span id="timerDisplay">--:--</span>
+    </div>
+  </nav>
+
+  <!-- SETUP SCREEN -->
+  <div class="setup-screen" id="setupScreen">
+    <div class="setup-card">
+      <div class="setup-icon"><i class="ti ti-clock-play"></i></div>
+      <h2>Set your test timer</h2>
+      <p>Choose a duration or enter a custom time. Timer starts when you click Begin Test.</p>
+      <div class="timer-options">
+        <div class="timer-opt selected" onclick="selectTime(15, this)">
+          <div class="t-min">15</div>
+          <div class="t-label">minutes</div>
+        </div>
+        <div class="timer-opt" onclick="selectTime(30, this)">
+          <div class="t-min">30</div>
+          <div class="t-label">minutes</div>
+        </div>
+        <div class="timer-opt" onclick="selectTime(60, this)">
+          <div class="t-min">60</div>
+          <div class="t-label">minutes</div>
+        </div>
+        <div class="timer-opt" onclick="selectTime(90, this)">
+          <div class="t-min">90</div>
+          <div class="t-label">minutes</div>
+        </div>
+        <div class="timer-opt" onclick="selectTime(120, this)">
+          <div class="t-min">120</div>
+          <div class="t-label">minutes</div>
+        </div>
+        <div class="timer-opt" onclick="selectTime(0, this)">
+          <div class="t-min">✎</div>
+          <div class="t-label">custom</div>
+        </div>
+      </div>
+      <div class="custom-time-wrap">
+        <label>Custom (minutes):</label>
+        <input class="custom-input" type="number" id="customTime" placeholder="e.g. 45" min="1" max="300" />
+      </div>
+      <button class="btn-start-test" onclick="startTest()">
+        <i class="ti ti-player-play" style="font-size:16px"></i>
+        Begin Test
+      </button>
+    </div>
+  </div>
+
+  <!-- TEST SCREEN -->
+  <div class="test-screen" id="testScreen">
+    <div class="feed" id="feed">
+      <div class="feed-inner" id="feedInner"></div>
+      <div class="submit-area" id="submitArea" style="display:none">
+        <div class="submit-stats">
+          <div class="submit-stat"><div class="ss-num ss-answered" id="ssAnswered">0</div><div class="ss-label">Answered</div></div>
+          <div class="submit-stat"><div class="ss-num ss-unattempted" id="ssUnattempted">0</div><div class="ss-label">Unattempted</div></div>
+          <div class="submit-stat"><div class="ss-num ss-total" id="ssTotal">0</div><div class="ss-label">Total</div></div>
+        </div>
+        <button class="btn-submit" onclick="submitTest()">
+          <i class="ti ti-send" style="font-size:17px"></i>
+          Submit Test
+        </button>
+      </div>
+    </div>
+
+    <div class="progress-footer">
+      <span class="pf-label" id="pfLabel">0 / 8 answered</span>
+      <div class="pf-bar"><div class="pf-fill" id="pfFill"></div></div>
+      <span class="pf-pct" id="pfPct">0%</span>
+    </div>
+  </div>
+
+  <!-- REVIEW DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+  <div class="review-drawer" id="reviewDrawer">
+    <div class="drawer-header">
+      <span class="drawer-title">Question Review</span>
+      <button class="drawer-close" onclick="toggleDrawer()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="drawer-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Answered</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Visited</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--border)"></div>Unattempted</div>
+    </div>
+    <div class="drawer-grid" id="drawerGrid"></div>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      { type:'mcq', text:'Which of the following is a vector quantity?', options:['Speed','Velocity','Distance','Mass'], correct:1, aiAnswer:'Velocity has both magnitude and direction — making it a vector quantity unlike speed which is scalar.' },
+      { type:'mcq', text:'The SI unit of electric potential is?', options:['Ampere','Ohm','Volt','Watt'], correct:2, aiAnswer:'Electric potential is measured in Volts (V), named after Alessandro Volta.' },
+      { type:'para', text:'Explain the principle of conservation of energy with an example.', options:[], correct:null, aiAnswer:'Energy cannot be created or destroyed, only converted. Example: A falling ball converts potential energy to kinetic energy.' },
+      { type:'mcq', text:"Newton's second law states that force equals?", options:['Mass × Velocity','Mass × Acceleration','Mass × Distance','Mass × Speed'], correct:1, aiAnswer:'F = ma — Force equals mass multiplied by acceleration. This is Newton\'s Second Law.' },
+      { type:'mcq', text:'Which law explains the motion of planets around the sun?', options:["Newton's law","Kepler's law","Ohm's law","Boyle's law"], correct:1, aiAnswer:"Kepler's three laws of planetary motion describe elliptical orbits, speed variation, and orbital periods." },
+      { type:'para', text:'State and prove the work-energy theorem.', options:[], correct:null, aiAnswer:'The net work done on an object equals the change in its kinetic energy: W = ΔKE = ½mv² − ½mu²' },
+      { type:'mcq', text:'The speed of light in vacuum is approximately?', options:['3×10⁶ m/s','3×10⁸ m/s','3×10¹⁰ m/s','3×10¹² m/s'], correct:1, aiAnswer:'c ≈ 3×10⁸ m/s (300,000 km/s). This is a fundamental constant in physics.' },
+      { type:'mcq', text:"Ohm's law states that current is proportional to?", options:['Resistance','Power','Voltage','Frequency'], correct:2, aiAnswer:'V = IR — at constant resistance, current is directly proportional to voltage.' },
+    ];
+
+    const letters = ['A','B','C','D'];
+    const userAnswers = {};
+    const visitedSet = new Set();
+    let answered = 0;
+    let selectedMinutes = 15;
+    let timerInterval = null;
+    let timeLeft = 0;
+    let submitted = false;
+
+    function selectTime(mins, el) {
+      document.querySelectorAll('.timer-opt').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      if (mins > 0) { selectedMinutes = mins; document.getElementById('customTime').value = ''; }
+    }
+
+    function startTest() {
+      const custom = parseInt(document.getElementById('customTime').value);
+      if (!isNaN(custom) && custom > 0) selectedMinutes = custom;
+      timeLeft = selectedMinutes * 60;
+      document.getElementById('setupScreen').style.display = 'none';
+      document.getElementById('testScreen').classList.add('active');
+      buildQuestions();
+      buildDrawer();
+      startTimer();
+      document.getElementById('navSub').textContent = `0 of ${QUESTIONS.length} answered`;
+      document.getElementById('submitArea').style.display = 'block';
+      updateSubmitStats();
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) { clearInterval(timerInterval); submitTest(); }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
+      const s = (timeLeft % 60).toString().padStart(2,'0');
+      document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+      const wrap = document.getElementById('timerWrap');
+      wrap.classList.remove('warning','danger');
+      if (timeLeft <= 60) wrap.classList.add('danger');
+      else if (timeLeft <= 300) wrap.classList.add('warning');
+    }
+
+    function buildQuestions() {
+      document.getElementById('feedInner').innerHTML = QUESTIONS.map((q, idx) => {
+        let body = '';
+        if (q.type === 'mcq') {
+          body = `<div class="mcq-opts">` +
+            q.options.map((opt,i) => `
+              <div class="mcq-opt" id="opt-${idx}-${i}" onclick="selectOpt(${idx},${i})">
+                <div class="opt-badge">${letters[i]}</div>${opt}
+              </div>`).join('') +
+          `</div>`;
+        } else {
+          body = `<div style="font-size:13px;color:var(--muted);font-style:italic;padding:12px 14px;background:var(--surface2);border:1px dashed var(--border);border-radius:10px;margin-bottom:14px">
+            <i class="ti ti-pencil" style="font-size:14px;vertical-align:-2px;margin-right:6px"></i>
+            Write/think your answer — AI explanation revealed after submit
+          </div>`;
+        }
+        return `
+          <div class="q-card" id="card-${idx}" style="animation-delay:${idx*0.06}s">
+            <div class="q-card-top">
+              <span class="q-num">Q${idx+1}</span>
+              <span class="q-type ${q.type}">${q.type==='mcq'?'MCQ':'Theory'}</span>
+            </div>
+            <div class="q-text">${q.text}</div>
+            ${body}
+            <div class="ai-answer-box" id="aibox-${idx}">
+              <i class="ti ti-lock"></i>
+              AI answer — revealed after submit
+            </div>
+            <div class="q-divider"></div>
+          </div>`;
+      }).join('');
+    }
+
+    function buildDrawer() {
+      const grid = document.getElementById('drawerGrid');
+      grid.innerHTML = QUESTIONS.map((_,i) =>
+        `<button class="drawer-q-btn" id="dq-${i}" onclick="jumpTo(${i})">${i+1}</button>`
+      ).join('');
+    }
+
+    function selectOpt(cardIdx, optIdx) {
+      if (submitted) return;
+      const wasAnswered = userAnswers[cardIdx] !== undefined;
+      userAnswers[cardIdx] = optIdx;
+      visitedSet.add(cardIdx);
+
+      QUESTIONS[cardIdx].options.forEach((_,i) => {
+        const opt = document.getElementById(`opt-${cardIdx}-${i}`);
+        opt.classList.toggle('selected', i === optIdx);
+        opt.querySelector('.opt-badge').style.background = i === optIdx ? 'var(--purple)' : '';
+        opt.querySelector('.opt-badge').style.color = i === optIdx ? '#fff' : '';
+      });
+
+      document.getElementById(`card-${cardIdx}`).classList.add('answered');
+      const dqBtn = document.getElementById(`dq-${cardIdx}`);
+      dqBtn.classList.remove('visited');
+      dqBtn.classList.add('answered');
+
+      if (!wasAnswered) { answered++; updateProgress(); }
+      updateSubmitStats();
+    }
+
+    function jumpTo(idx) {
+      toggleDrawer();
+      const card = document.getElementById(`card-${idx}`);
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (userAnswers[idx] === undefined) {
+        visitedSet.add(idx);
+        const dqBtn = document.getElementById(`dq-${idx}`);
+        if (!dqBtn.classList.contains('answered')) dqBtn.classList.add('visited');
+      }
+    }
+
+    function updateProgress() {
+      const pct = Math.round((answered / QUESTIONS.length) * 100);
+      document.getElementById('pfLabel').textContent = `${answered} / ${QUESTIONS.length} answered`;
+      document.getElementById('pfPct').textContent = pct + '%';
+      document.getElementById('pfFill').style.width = pct + '%';
+      document.getElementById('navSub').textContent = `${answered} of ${QUESTIONS.length} answered`;
+    }
+
+    function updateSubmitStats() {
+      document.getElementById('ssAnswered').textContent = answered;
+      document.getElementById('ssUnattempted').textContent = QUESTIONS.length - answered;
+      document.getElementById('ssTotal').textContent = QUESTIONS.length;
+    }
+
+    function submitTest() {
+      if (submitted) return;
+      submitted = true;
+      clearInterval(timerInterval);
+
+      let correct = 0;
+      QUESTIONS.forEach((q, idx) => {
+        const card = document.getElementById(`card-${idx}`);
+        const aibox = document.getElementById(`aibox-${idx}`);
+
+        // Reveal AI answer
+        aibox.classList.add('revealed');
+        aibox.innerHTML = `<i class="ti ti-robot"></i> ${q.aiAnswer}`;
+
+        if (q.type === 'mcq') {
+          const userAns = userAnswers[idx];
+          q.options.forEach((_,i) => {
+            const opt = document.getElementById(`opt-${idx}-${i}`);
+            opt.style.cursor = 'default';
+            opt.onclick = null;
+            if (i === q.correct) {
+              opt.classList.add('reveal-correct');
+              opt.querySelector('.opt-badge').style.background = 'var(--green)';
+              opt.querySelector('.opt-badge').style.color = '#fff';
+            } else if (i === userAns && userAns !== q.correct) {
+              opt.classList.add('reveal-wrong');
+              opt.querySelector('.opt-badge').style.background = 'var(--red)';
+              opt.querySelector('.opt-badge').style.color = '#fff';
+            }
+          });
+          if (userAns === q.correct) { correct++; card.classList.add('correct-reveal'); }
+          else if (userAns !== undefined) { card.classList.add('wrong-reveal'); }
+        }
+      });
+
+      sessionStorage.setItem('score', correct);
+      sessionStorage.setItem('total', QUESTIONS.length);
+      sessionStorage.setItem('answered', answered);
+
+      setTimeout(() => { window.location.href = 'results.html'; }, 2800);
+    }
+
+    function toggleDrawer() {
+      document.getElementById('reviewDrawer').classList.toggle('open');
+      document.getElementById('drawerOverlay').classList.toggle('active');
+    }
+  </script>
+</body>
+</html>
