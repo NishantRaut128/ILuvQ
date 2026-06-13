@@ -72,26 +72,49 @@ Tech Stack
  Project Structure
 
 ILuvQ/
+
 -- frontend/
-  -> index.html
-  -> extraction.html
-  -> review.html
-  -> practice.html
-  -> test.html
-  -> results.html
-  -> auth.html
-  -> 404.html
+
+    -> index.html
+    
+    -> extraction.html
+   
+    -> review.html
+   
+    -> practice.html
+   
+    -> test.html
+   
+    -> results.html
+   
+    -> auth.html
+  
+    -> 404.html
+
+
 -- backend/
-  -> main.py
-  -> auth.py
-  -> database.py
-  -> models.py
-  -> upload.py
-  -> extract.py
-  -> session_routes.py
-  -> schemas.py
-  -> requirements.txt
-  -> iluvq.db
+  
+    -> main.py
+    
+    -> auth.py
+    
+    -> database.py
+    
+    -> models.py
+    
+    -> upload.py
+    
+    -> extract.py
+    
+    -> session_routes.py
+    
+    -> schemas.py
+    
+    -> requirements.txt
+    
+    -> iluvq.db
+
+
 --README.md
 
 
