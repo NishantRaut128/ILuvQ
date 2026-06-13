@@ -1,5 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from upload import router as upload_router
+from extract import router as extract_router
+from session_routes import router as session_router
+
 
 import models
 from database import Base, engine, get_db
@@ -13,6 +17,10 @@ from schemas import SignupSchema, LoginSchema
 app = FastAPI(title="ILuvQ API")
 
 Base.metadata.create_all(bind=engine)
+
+app.include_router(upload_router)
+app.include_router(extract_router)
+app.include_router(session_router)
 
 
 @app.get("/")
